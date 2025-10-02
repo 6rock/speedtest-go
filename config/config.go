@@ -3,6 +3,7 @@ package config
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"strconv"
 )
 
 type Config struct {
@@ -35,28 +36,36 @@ type Config struct {
 
 var (
 	configFile   string
-	loadedConfig *Config = nil
+	loadedConfig = &Config{
+		Port:              "8080",
+		DatabaseType:      "none",
+		ProxyProtocolPort: "0",
+		ServerLat:         1,
+		ServerLng:         1,
+		StatsPassword:     "PASSWORD",
+	}
 )
 
-func init() {
-	viper.SetDefault("listen_port", "8989")
-	viper.SetDefault("url_base", "")
-	viper.SetDefault("proxyprotocol_port", "0")
-	viper.SetDefault("download_chunks", 4)
-	viper.SetDefault("distance_unit", "K")
-	viper.SetDefault("enable_cors", false)
-	viper.SetDefault("statistics_password", "PASSWORD")
-	viper.SetDefault("redact_ip_addresses", false)
-	viper.SetDefault("database_type", "postgresql")
-	viper.SetDefault("database_hostname", "localhost")
-	viper.SetDefault("database_name", "speedtest")
-	viper.SetDefault("database_username", "postgres")
-	viper.SetDefault("enable_tls", false)
-	viper.SetDefault("enable_http2", false)
-
-	viper.SetConfigName("settings")
-	viper.AddConfigPath(".")
-}
+//
+//func init() {
+//	viper.SetDefault("listen_port", "8989")
+//	viper.SetDefault("url_base", "")
+//	viper.SetDefault("proxyprotocol_port", "0")
+//	viper.SetDefault("download_chunks", 4)
+//	viper.SetDefault("distance_unit", "K")
+//	viper.SetDefault("enable_cors", false)
+//	viper.SetDefault("statistics_password", "PASSWORD")
+//	viper.SetDefault("redact_ip_addresses", false)
+//	viper.SetDefault("database_type", "postgresql")
+//	viper.SetDefault("database_hostname", "localhost")
+//	viper.SetDefault("database_name", "speedtest")
+//	viper.SetDefault("database_username", "postgres")
+//	viper.SetDefault("enable_tls", false)
+//	viper.SetDefault("enable_http2", false)
+//
+//	viper.SetConfigName("settings")
+//	viper.AddConfigPath(".")
+//}
 
 func Load(configPath string) Config {
 	var conf Config
@@ -77,8 +86,10 @@ func Load(configPath string) Config {
 }
 
 func LoadedConfig() *Config {
-	if loadedConfig == nil {
-		Load(configFile)
-	}
 	return loadedConfig
+}
+
+func SetConfig(addr string, port int) {
+	loadedConfig.BindAddress = addr
+	loadedConfig.Port = strconv.Itoa(port)
 }
